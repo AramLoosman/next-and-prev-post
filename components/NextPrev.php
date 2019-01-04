@@ -76,18 +76,19 @@ class NextPrev extends ComponentBase
     public function getNP($pp){
         $params = ($pp=='Next') ? array(0 =>'>',1 => 'asc') : array(0 => '<', 1 => 'desc');
         $currentPostId =  $this->getPostId();
+        $currentPost = Post::where( 'id', $currentPostId)->first();
         $category = $this->getCategory();
 
        if($currentPostId != 0){
             $post =  Post::isPublished();
-                $post   ->where('id',$params[0],$currentPostId)
-                        ->orderBy('id',$params[1]);
-                if ($category !== null) {
-                    if (!is_array($category)) $category = [$category];
-                    $post->whereHas('categories', function($q) use ($category) {
-                        $q->whereIn('id', $category);
-                    });
-                }
+            $post   ->where('published_at',$params[0],$currentPost->published_at)
+                    ->orderBy('published_at',$params[1]);
+            if ($category !== null) {
+                if (!is_array($category)) $category = [$category];
+                $post->whereHas('categories', function($q) use ($category) {
+                    $q->whereIn('id', $category);
+                });
+            }
             $np = $post->first();
 
             /* Agregamos el helper de la URL */
